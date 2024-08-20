@@ -1,0 +1,617 @@
+<html><head><base href="https://bitjuce.xyz/random-generator/"><title>Random Person Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --bg-color: #1d1d1f;
+    --container-bg: rgba(44, 44, 46, 0.8);
+    --text-color: #f5f5f7;
+    --secondary-text-color: #a1a1a6;
+    --output-bg: rgba(255, 255, 255, 0.05);
+    --button-bg: #0a84ff;
+    --button-hover-bg: #409cff;
+    --input-border: #6e6e73;
+    --input-bg: #2c2c2e;
+    --switch-bg: #4a4a4a;
+    --tab-bg: rgba(0, 0, 0, 0.3);
+    --tab-hover-bg: rgba(255, 255, 255, 0.1);
+    --checkbox-bg: #3a3a3c;
+    --checkbox-border: #6e6e73;
+    --disclaimer-bg: rgba(255, 255, 255, 0.1);
+  }
+
+  body.light-mode {
+    --bg-color: #f5f5f7;
+    --container-bg: rgba(255, 255, 255, 0.8);
+    --text-color: #1d1d1f;
+    --secondary-text-color: #86868b;
+    --output-bg: rgba(0, 0, 0, 0.03);
+    --button-bg: #0071e3;
+    --button-hover-bg: #0077ed;
+    --input-border: #d2d2d7;
+    --input-bg: #fff;
+    --switch-bg: #e4e4e4;
+    --tab-bg: rgba(0, 0, 0, 0.05);
+    --tab-hover-bg: rgba(0, 0, 0, 0.1);
+    --checkbox-bg: #ffffff;
+    --checkbox-border: #d2d2d7;
+    --disclaimer-bg: rgba(0, 0, 0, 0.05);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+  }
+  .container {
+    background-color: var(--container-bg);
+    backdrop-filter: blur(20px);
+    padding: 2rem;
+    border-radius: 18px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 800px;
+    width: 100%;
+    transition: background-color 0.3s;
+    margin-top: 60px;
+  }
+  h1 {
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 28px;
+    margin-bottom: 24px;
+  }
+  #output {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background-color: var(--output-bg);
+    border-radius: 12px;
+    text-align: left;
+    transition: background-color 0.3s;
+  }
+  button {
+    background-color: var(--button-bg);
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+  button:hover {
+    background-color: var(--button-hover-bg);
+    transform: scale(1.05);
+  }
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .option {
+    flex-basis: calc(50% - 10px);
+    margin-bottom: 16px;
+  }
+  select, input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    font-size: 14px;
+    transition: all 0.3s;
+    color: var(--text-color);
+  }
+  select:focus, input:focus {
+    outline: none;
+    border-color: var(--button-bg);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
+  }
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: var(--secondary-text-color);
+  }
+  #output h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-color);
+  }
+  #output p {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: var(--secondary-text-color);
+  }
+  .theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+  }
+  .theme-switch {
+    display: inline-block;
+    height: 34px;
+    position: relative;
+    width: 60px;
+  }
+  .theme-switch input {
+    display: none;
+  }
+  .slider {
+    background-color: var(--switch-bg);
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+  }
+  .slider:before {
+    background-color: #fff;
+    bottom: 4px;
+    content: "";
+    height: 26px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 26px;
+  }
+  input:checked + .slider {
+    background-color: var(--button-bg);
+  }
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+  .slider.round {
+    border-radius: 34px;
+  }
+  .slider.round:before {
+    border-radius: 50%;
+  }
+  .theme-switch-wrapper em {
+    margin-left: 10px;
+    font-size: 1rem;
+  }
+  .github-link {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: var(--tab-bg);
+    color: var(--text-color);
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    z-index: 100;
+  }
+  .github-link:hover {
+    background-color: var(--tab-hover-bg);
+  }
+  .github-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+  }
+  .output-section {
+    margin-bottom: 20px;
+  }
+  .output-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-color);
+  }
+
+  .randomize-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .randomize-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--checkbox-border);
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    margin-right: 10px;
+    position: relative;
+    background-color: var(--checkbox-bg);
+  }
+
+  .randomize-checkbox:checked {
+    background-color: var(--button-bg);
+    border-color: var(--button-bg);
+  }
+
+  .randomize-checkbox:checked::before {
+    content: '\2713';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+  }
+
+  .randomize-label {
+    font-size: 16px;
+    color: var(--text-color);
+    cursor: pointer;
+  }
+
+  .disclaimer {
+    background-color: var(--disclaimer-bg);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: left;
+    color: var(--secondary-text-color);
+  }
+
+  .disclaimer strong {
+    color: var(--text-color);
+  }
+
+  @media (max-width: 768px) {
+    body {
+      padding: 10px;
+    }
+    .container {
+      padding: 1rem;
+      margin-top: 80px;
+    }
+    h1 {
+      font-size: 24px;
+    }
+    .option {
+      flex-basis: 100%;
+    }
+    .theme-switch-wrapper {
+      top: 10px;
+      right: 10px;
+    }
+    .github-link {
+      top: 10px;
+      left: 10px;
+    }
+    #output h2 {
+      font-size: 20px;
+    }
+    #output p {
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .theme-switch-wrapper em {
+      display: none;
+    }
+    .github-link span {
+      display: none;
+    }
+    .github-link {
+      padding: 10px;
+    }
+    .github-icon {
+      margin-right: 0;
+    }
+  }
+</style>
+</head>
+<body>
+<a href="https://github.com/e-vicius/random-person-generator" target="_blank" class="github-link">
+  <svg class="github-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+  </svg>
+  <span>View on GitHub</span>
+</a>
+
+<div class="theme-switch-wrapper">
+  <label class="theme-switch" for="checkbox">
+    <input type="checkbox" id="checkbox" />
+    <div class="slider round"></div>
+  </label>
+  <em>Dark Mode</em>
+</div>
+
+<div class="container">
+  <h1>Random Person Generator</h1>
+  <div class="randomize-option">
+    <input type="checkbox" id="randomizeAll" class="randomize-checkbox">
+    <label for="randomizeAll" class="randomize-label">Randomize all selections</label>
+  </div>
+  <div class="options">
+    <div class="option">
+      <label for="nationality">Nationality</label>
+      <select id="nationality">
+        <option value="US">United States</option>
+        <option value="UK">United Kingdom</option>
+        <option value="CA">Canada</option>
+        <option value="AU">Australia</option>
+        <option value="FR">France</option>
+      </select>
+    </div>
+    <div class="option">
+      <label for="sex">Sex</label>
+      <select id="sex">
+        <option value="any">Any</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </div>
+    <div class="option">
+      <label for="minAge">Min Age</label>
+      <input type="number" id="minAge" min="18" max="100" value="18">
+    </div>
+    <div class="option">
+      <label for="maxAge">Max Age</label>
+      <input type="number" id="maxAge" min="18" max="100" value="80">
+    </div>
+  </div>
+  <button onclick="generateRandomInfo()">Generate Random Person</button>
+  <div id="output"></div>
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> All information generated on this website is entirely fictional and for entertainment or educational purposes only. Any resemblance to real persons or entities is purely coincidental. The generated email addresses, phone numbers, and other contact information are non-functional and should not be used for any real-world communication attempts. We do not condone any illegal actions or the use of this tool for fraudulent or harmful purposes. Please use this generator responsibly and ethically.
+  </div>
+</div>
+
+<script>
+const firstNames = {
+  male: {
+    US: ['Liam', 'Noah', 'Oliver', 'William', 'Elijah'],
+    UK: ['Oliver', 'George', 'Harry', 'Noah', 'Jack'],
+    CA: ['Liam', 'Noah', 'Oliver', 'William', 'Lucas'],
+    AU: ['Oliver', 'Noah', 'William', 'Jack', 'Leo'],
+    FR: ['Gabriel', 'Léo', 'Raphaël', 'Arthur', 'Louis']
+  },
+  female: {
+    US: ['Olivia', 'Emma', 'Ava', 'Charlotte', 'Sophia'],
+    UK: ['Olivia', 'Amelia', 'Isla', 'Ava', 'Mia'],
+    CA: ['Olivia', 'Emma', 'Charlotte', 'Ava', 'Sophia'],
+    AU: ['Charlotte', 'Olivia', 'Ava', 'Amelia', 'Mia'],
+    FR: ['Jade', 'Louise', 'Emma', 'Alice', 'Chloé']
+  }
+};
+
+const lastNames = {
+  US: ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones'],
+  UK: ['Smith', 'Jones', 'Williams', 'Taylor', 'Davies'],
+  CA: ['Smith', 'Brown', 'Tremblay', 'Martin', 'Roy'],
+  AU: ['Smith', 'Jones', 'Williams', 'Brown', 'Wilson'],
+  FR: ['Martin', 'Bernard', 'Dubois', 'Thomas', 'Robert']
+};
+
+const cities = {
+  US: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'],
+  UK: ['London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool'],
+  CA: ['Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Ottawa'],
+  AU: ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide'],
+  FR: ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice']
+};
+
+const streetNames = {
+  US: ['Main St', 'Oak Ave', 'Maple Rd', 'Cedar Ln', 'Washington Blvd'],
+  UK: ['High St', 'Station Rd', 'Church St', 'Park Rd', 'London Rd'],
+  CA: ['Yonge St', 'King St', 'Queen St', 'Main St', 'Wellington St'],
+  AU: ['George St', 'Collins St', 'King St', 'William St', 'Elizabeth St'],
+  FR: ['Rue de la Paix', 'Avenue des Champs-Élysées', 'Rue du Faubourg Saint-Honoré', 'Boulevard Saint-Michel', 'Rue de Rivoli']
+};
+
+const emailDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com'];
+
+const jobs = [
+  'Software Developer', 'Teacher', 'Nurse', 'Sales Representative', 'Marketing Manager',
+  'Accountant', 'Chef', 'Graphic Designer', 'Electrician', 'Lawyer'
+];
+
+const companies = [
+  'Tech Innovations Inc.', 'Global Education Ltd.', 'HealthCare Solutions', 'SalesPro Corp', 'MarketMind Agency',
+  'AccountEdge Services', 'Gourmet Delights Restaurant', 'DesignMasters Studio', 'ElectraTech Solutions', 'LegalEagle Firm'
+];
+
+function generateRandomInfo() {
+  const randomizeAll = document.getElementById('randomizeAll').checked;
+  
+  let nationality = document.getElementById('nationality').value;
+  let sex = document.getElementById('sex').value;
+  let minAge = parseInt(document.getElementById('minAge').value);
+  let maxAge = parseInt(document.getElementById('maxAge').value);
+
+  if (randomizeAll) {
+    const nationalities = ['US', 'UK', 'CA', 'AU', 'FR'];
+    nationality = nationalities[Math.floor(Math.random() * nationalities.length)];
+    sex = ['any', 'male', 'female'][Math.floor(Math.random() * 3)];
+    minAge = Math.floor(Math.random() * (50 - 18 + 1)) + 18; // Random min age between 18 and 50
+    maxAge = Math.floor(Math.random() * (100 - minAge + 1)) + minAge; // Random max age between minAge and 100
+  }
+
+  const chosenSex = sex === 'any' ? (Math.random() < 0.5 ? 'male' : 'female') : sex;
+  const firstName = firstNames[chosenSex][nationality][Math.floor(Math.random() * firstNames[chosenSex][nationality].length)];
+  const lastName = lastNames[nationality][Math.floor(Math.random() * lastNames[nationality].length)];
+  const age = Math.floor(Math.random() * (maxAge - minAge + 1)) + minAge;
+  
+  const city = cities[nationality][Math.floor(Math.random() * cities[nationality].length)];
+  const streetName = streetNames[nationality][Math.floor(Math.random() * streetNames[nationality].length)];
+  const houseNumber = Math.floor(Math.random() * 1000) + 1;
+  
+  let zipCode;
+  switch(nationality) {
+    case 'US':
+      zipCode = Math.floor(10000 + Math.random() * 90000);
+      break;
+    case 'UK':
+      zipCode = `${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${Math.floor(1 + Math.random() * 9)} ${Math.floor(1 + Math.random() * 9)}${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${String.fromCharCode(65 + Math.floor(Math.random() * 26))}`;
+      break;
+    case 'CA':
+      zipCode = `${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${Math.floor(1 + Math.random() * 9)}${String.fromCharCode(65 + Math.floor(Math.random() * 26))} ${Math.floor(1 + Math.random() * 9)}${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${Math.floor(1 + Math.random() * 9)}`;
+      break;
+    case 'AU':
+      zipCode = Math.floor(1000 + Math.random() * 9000);
+      break;
+    case 'FR':
+      zipCode = Math.floor(10000 + Math.random() * 90000);
+      break;
+  }
+
+  let phoneNumber;
+  switch(nationality) {
+    case 'US':
+      phoneNumber = `+1 ${Math.floor(100 + Math.random() * 900)}-${Math.floor(100 + Math.random() * 900)}-${Math.floor(1000 + Math.random() * 9000)}`;
+      break;
+    case 'UK':
+      phoneNumber = `+44 ${Math.floor(100 + Math.random() * 900)} ${Math.floor(100 + Math.random() * 900)} ${Math.floor(1000 + Math.random() * 9000)}`;
+      break;
+    case 'CA':
+      phoneNumber = `+1 ${Math.floor(100 + Math.random() * 900)}-${Math.floor(100 + Math.random() * 900)}-${Math.floor(1000 + Math.random() * 9000)}`;
+      break;
+    case 'AU':
+      phoneNumber = `+61 ${Math.floor(2 + Math.random() * 8)} ${Math.floor(1000 + Math.random() * 9000)} ${Math.floor(1000 + Math.random() * 9000)}`;
+      break;
+    case 'FR':
+      phoneNumber = `+33 ${Math.floor(1 + Math.random() * 9)} ${Math.floor(10 + Math.random() * 90)} ${Math.floor(10 + Math.random() * 90)} ${Math.floor(10 + Math.random() * 90)} ${Math.floor(10 + Math.random() * 90)}`;
+      break;
+  }
+
+  const emailDomain = emailDomains[Math.floor(Math.random() * emailDomains.length)];
+  const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(Math.random() * 1000)}@${emailDomain}`;
+
+  // Generate birthday
+  const currentYear = new Date().getFullYear();
+  const birthYear = currentYear - age;
+  const birthMonth = Math.floor(Math.random() * 12) + 1;
+  const birthDay = Math.floor(Math.random() * 28) + 1; // Simplifying to avoid month-specific day counts
+  const birthday = `${birthYear}-${birthMonth.toString().padStart(2, '0')}-${birthDay.toString().padStart(2, '0')}`;
+
+  // Generate physical characteristics
+  const heightCm = Math.floor(150 + Math.random() * 50);
+  const heightFt = Math.floor(heightCm / 30.48);
+  const heightIn = Math.round((heightCm / 2.54) % 12);
+  const weightKg = Math.floor(50 + Math.random() * 50);
+  const weightLbs = Math.round(weightKg * 2.20462);
+  const eyeColors = ['Brown', 'Blue', 'Green', 'Hazel', 'Gray'];
+  const eyeColor = eyeColors[Math.floor(Math.random() * eyeColors.length)];
+  const hairColors = ['Black', 'Brown', 'Blonde', 'Red', 'Gray'];
+  const hairColor = hairColors[Math.floor(Math.random() * hairColors.length)];
+
+  // Generate employment information
+  const job = jobs[Math.floor(Math.random() * jobs.length)];
+  const company = companies[Math.floor(Math.random() * companies.length)];
+  const yearsEmployed = Math.floor(Math.random() * (age - 18)) + 1;
+
+  const output = document.getElementById('output');
+  output.innerHTML = `
+    <h2>${firstName} ${lastName}</h2>
+    <div class="output-section">
+      <h3>Personal Information</h3>
+      <p>Age: ${age}</p>
+      <p>Sex: ${chosenSex.charAt(0).toUpperCase() + chosenSex.slice(1)}</p>
+      <p>Nationality: ${nationality}</p>
+      <p>Birthday: ${birthday}</p>
+    </div>
+    <div class="output-section">
+      <h3>Contact Information</h3>
+      <p>Address: ${houseNumber} ${streetName}, ${city}, ${zipCode}</p>
+      <p>Phone: ${phoneNumber}</p>
+      <p>Email: ${email}</p>
+    </div>
+    <div class="output-section">
+      <h3>Physical Characteristics</h3>
+      <p>Height: ${heightCm} cm (${heightFt}'${heightIn}")</p>
+      <p>Weight: ${weightKg} kg (${weightLbs} lbs)</p>
+      <p>Eye Color: ${eyeColor}</p>
+      <p>Hair Color: ${hairColor}</p>
+    </div>
+    <div class="output-section">
+      <h3>Employment Information</h3>
+      <p>Job: ${job}</p>
+      <p>Company: ${company}</p>
+      <p>Years Employed: ${yearsEmployed}</p>
+    </div>
+  `;
+
+  if (randomizeAll) {
+    document.getElementById('nationality').value = nationality;
+    document.getElementById('sex').value = sex;
+    document.getElementById('minAge').value = minAge;
+    document.getElementById('maxAge').value = maxAge;
+  }
+}
+
+const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+
+function switchTheme(e) {
+    if (e.target.checked) {
+        document.body.classList.add('light-mode');
+        document.querySelector('.theme-switch-wrapper em').textContent = 'Light Mode';
+    } else {
+        document.body.classList.remove('light-mode');
+        document.querySelector('.theme-switch-wrapper em').textContent = 'Dark Mode';
+    }    
+}
+
+toggleSwitch.addEventListener('change', switchTheme, false);
+
+// Set dark mode as default
+document.body.classList.remove('light-mode');
+toggleSwitch.checked = false;
+document.querySelector('.theme-switch-wrapper em').textContent = 'Dark Mode';
+
+function saveThemePreference(isLight) {
+    localStorage.setItem('theme', isLight ? 'light-mode' : 'dark-mode');
+}
+
+toggleSwitch.addEventListener('change', function(e) {
+    switchTheme(e);
+    saveThemePreference(e.target.checked);
+});
+
+// Ensure the content doesn't overlap with fixed position elements
+window.addEventListener('load', function() {
+    const githubLink = document.querySelector('.github-link');
+    const themeSwitch = document.querySelector('.theme-switch-wrapper');
+    const container = document.querySelector('.container');
+
+    function adjustContainerMargin() {
+        const githubLinkHeight = githubLink.offsetHeight;
+        const themeSwitchHeight = themeSwitch.offsetHeight;
+        const maxHeight = Math.max(githubLinkHeight, themeSwitchHeight);
+        container.style.marginTop = `${maxHeight + 20}px`;
+    }
+
+    adjustContainerMargin();
+    window.addEventListener('resize', adjustContainerMargin);
+});
+</script>
+</body>
+</html>
